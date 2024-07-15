@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
             resumeData.personalInfo[this.name] = this.value;
             updateResumePreview();
             updateProgress();
+            updateATSScore();
         });
     });
 
@@ -53,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const experienceEntry = createExperienceEntry();
         document.getElementById('experienceEntries').appendChild(experienceEntry);
         updateProgress();
+        updateATSScore();
     });
 
     // Education
@@ -60,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const educationEntry = createEducationEntry();
         document.getElementById('educationEntries').appendChild(educationEntry);
         updateProgress();
+        updateATSScore();
     });
 
     // Skills
@@ -69,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
             addSkill(skillInput.value.trim());
             skillInput.value = '';
             updateProgress();
+            updateATSScore();
         }
     });
 
@@ -77,6 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const projectEntry = createProjectEntry();
         document.getElementById('projectEntries').appendChild(projectEntry);
         updateProgress();
+        updateATSScore();
     });
 
     // Form submission
@@ -88,26 +93,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Helper functions
     function createExperienceEntry() {
         const entry = document.createElement('div');
-        entry.className = 'experience-entry';
+        entry.className = 'experience-entry slide-in';
         entry.innerHTML = `
             <div class="drag-handle"><i class="fas fa-grip-lines"></i></div>
-            <input type="text" placeholder="Job Title" name="jobTitle">
-            <input type="text" placeholder="Company" name="company">
+            <input type="text" placeholder="Job Title" name="jobTitle" required>
+            <input type="text" placeholder="Company" name="company" required>
             <input type="text" placeholder="Location" name="location">
             <input type="date" name="startDate">
             <input type="date" name="endDate">
-            <textarea placeholder="Job Description" name="description"></textarea>
+            <textarea placeholder="Job Description" name="description" required></textarea>
             <button type="button" class="remove-btn">Remove</button>
         `;
         entry.querySelector('.remove-btn').addEventListener('click', function() {
             entry.remove();
             updateResumePreview();
             updateProgress();
+            updateATSScore();
         });
         entry.querySelectorAll('input, textarea').forEach(input => {
             input.addEventListener('input', function() {
                 updateResumePreview();
                 updateProgress();
+                updateATSScore();
             });
         });
         return entry;
@@ -115,11 +122,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function createEducationEntry() {
         const entry = document.createElement('div');
-        entry.className = 'education-entry';
+        entry.className = 'education-entry slide-in';
         entry.innerHTML = `
             <div class="drag-handle"><i class="fas fa-grip-lines"></i></div>
-            <input type="text" placeholder="Degree" name="degree">
-            <input type="text" placeholder="Institution" name="institution">
+            <input type="text" placeholder="Degree" name="degree" required>
+            <input type="text" placeholder="Institution" name="institution" required>
             <input type="text" placeholder="Location" name="location">
             <input type="date" name="graduationDate">
             <button type="button" class="remove-btn">Remove</button>
@@ -128,11 +135,13 @@ document.addEventListener('DOMContentLoaded', function() {
             entry.remove();
             updateResumePreview();
             updateProgress();
+            updateATSScore();
         });
         entry.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', function() {
                 updateResumePreview();
                 updateProgress();
+                updateATSScore();
             });
         });
         return entry;
@@ -140,15 +149,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function addSkill(skill) {
         const skillTag = document.createElement('span');
-        skillTag.className = 'skill-tag';
+        skillTag.className = 'skill-tag fade-in';
         skillTag.textContent = skill;
         const removeBtn = document.createElement('span');
         removeBtn.className = 'remove-btn';
         removeBtn.innerHTML = '&times;';
         removeBtn.addEventListener('click', function() {
             skillTag.remove();
+            resumeData.skills = resumeData.skills.filter(s => s !== skill);
             updateResumePreview();
             updateProgress();
+            updateATSScore();
         });
         skillTag.appendChild(removeBtn);
         document.getElementById('skillsEntries').appendChild(skillTag);
@@ -158,11 +169,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function createProjectEntry() {
         const entry = document.createElement('div');
-        entry.className = 'project-entry';
+        entry.className = 'project-entry slide-in';
         entry.innerHTML = `
             <div class="drag-handle"><i class="fas fa-grip-lines"></i></div>
-            <input type="text" placeholder="Project Name" name="projectName">
-            <textarea placeholder="Project Description" name="projectDescription"></textarea>
+            <input type="text" placeholder="Project Name" name="projectName" required>
+            <textarea placeholder="Project Description" name="projectDescription" required></textarea>
             <input type="text" placeholder="Technologies Used" name="technologies">
             <button type="button" class="remove-btn">Remove</button>
         `;
@@ -170,11 +181,13 @@ document.addEventListener('DOMContentLoaded', function() {
             entry.remove();
             updateResumePreview();
             updateProgress();
+            updateATSScore();
         });
         entry.querySelectorAll('input, textarea').forEach(input => {
             input.addEventListener('input', function() {
                 updateResumePreview();
                 updateProgress();
+                updateATSScore();
             });
         });
         return entry;
@@ -218,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
             experiences.forEach(exp => {
                 preview.innerHTML += `
                     <h3>${exp.jobTitle} at ${exp.company}</h3>
-                    <p>${exp.location} | ${exp.startDate} - ${exp.endDate}</p>
+                    <p>${exp.location} | ${formatDate(exp.startDate)} - ${formatDate(exp.endDate)}</p>
                     <p>${exp.description}</p>
                 `;
             });
@@ -238,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
             education.forEach(edu => {
                 preview.innerHTML += `
                     <h3>${edu.degree} - ${edu.institution}</h3>
-                    <p>${edu.location} | Graduated: ${edu.graduationDate}</p>
+                    <p>${edu.location} | Graduated: ${formatDate(edu.graduationDate)}</p>
                 `;
             });
         }
@@ -270,48 +283,169 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             });
         }
+
+        // Add fade-in animation to new content
+        const newSections = preview.querySelectorAll('h2, h3, p, ul');
+        newSections.forEach(section => {
+            section.classList.add('fade-in');
+        });
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return 'Present';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+    }
+
+    function updateATSScore() {
+        let score = 0;
+        const maxScore = 100;
+
+        // Personal Information
+        score += resumeData.personalInfo.name ? 5 : 0;
+        score += resumeData.personalInfo.email ? 5 : 0;
+        score += resumeData.personalInfo.phone ? 5 : 0;
+        score += resumeData.personalInfo.location ? 3 : 0;
+        score += resumeData.personalInfo.summary ? 7 : 0;
+
+        // Experience
+        const experiences = document.querySelectorAll('.experience-entry');
+        experiences.forEach(exp => {
+            score += 5; // Base score for each experience
+            score += exp.querySelector('[name="description"]').value.length > 100 ? 3 : 0; // Bonus for detailed description
+        });
+
+        // Education
+        const education = document.querySelectorAll('.education-entry');
+        education.forEach(edu => {
+            score += 5; // Base score for each education entry
+        });
+
+        // Skills
+        score += Math.min(resumeData.skills.length * 2, 10); // Up to 10 points for skills
+
+        // Projects
+        const projects = document.querySelectorAll('.project-entry');
+        projects.forEach(project => {
+            score += 3; // Base score for each project
+            score += project.querySelector('[name="technologies"]').value.split(',').length > 2 ? 2 : 0; // Bonus for multiple technologies
+        });
+
+        // Keyword matching (simplified version)
+        const keywords = ['leadership', 'teamwork', 'communication', 'problem-solving', 'innovative'];
+        const allText = JSON.stringify(resumeData).toLowerCase();
+        keywords.forEach(keyword => {
+            if (allText.includes(keyword)) score += 2;
+        });
+
+        // Normalize score
+        score = Math.min(score, maxScore);
+
+        // Update ATS score display
+        const atsScoreElement = document.getElementById('atsScoreValue');
+        const atsScoreBar = document.querySelector('#atsScore .bg-blue-600');
+        atsScoreElement.textContent = `${score}%`;
+        atsScoreBar.style.width = `${score}%`;
+
+        // Update suggestions
+        updateSuggestions(score);
+    }
+
+    function updateSuggestions(score) {
+        const suggestionsList = document.getElementById('suggestionsList');
+        suggestionsList.innerHTML = '';
+
+        if (score < 70) {
+            suggestionsList.innerHTML += '<li>Consider adding more details to your work experiences.</li>';
+        }
+        if (resumeData.skills.length < 5) {
+            suggestionsList.innerHTML += '<li>Try to include at least 5 relevant skills.</li>';
+        }
+        if (!resumeData.personalInfo.summary) {
+            suggestionsList.innerHTML += '<li>A professional summary can greatly improve your resume.</li>';
+        }
+        if (document.querySelectorAll('.experience-entry').length < 2) {
+            suggestionsList.innerHTML += '<li>Including more work experiences can strengthen your resume.</li>';
+        }
+        if (document.querySelectorAll('.project-entry').length < 2) {
+            suggestionsList.innerHTML += '<li>Adding more projects can showcase your practical skills.</li>';
+        }
+        if (!resumeData.personalInfo.location) {
+            suggestionsList.innerHTML += '<li>Including your location can help with local job searches.</li>';
+        }
+        // Check for keywords
+        const keywords = ['leadership', 'teamwork', 'communication', 'problem-solving', 'innovative'];
+        const allText = JSON.stringify(resumeData).toLowerCase();
+        const missingKeywords = keywords.filter(keyword => !allText.includes(keyword));
+        if (missingKeywords.length > 0) {
+            suggestionsList.innerHTML += `<li>Consider incorporating these keywords: ${missingKeywords.join(', ')}</li>`;
+        }
     }
 
     function generateResume() {
-        const resumePreview = document.getElementById('resumePreview');
-        const formData = new FormData(form);
-        
-        let resumeHTML = `
-            <div class="resume-${selectedTemplate} ${selectedColor} ${selectedLayout}">
-                <h1>${formData.get('name')}</h1>
-                <p>${formData.get('email')} | ${formData.get('phone')} | ${formData.get('location')}</p>
-                
-                <div class="resume-section">
-                    <h2>Professional Summary</h2>
-                    <p>${formData.get('summary')}</p>
-                </div>
-                
-                <div class="resume-section">
-                    <h2>Work Experience</h2>
-                    ${generateExperienceHTML()}
-                </div>
-                
-                <div class="resume-section">
-                    <h2>Education</h2>
-                    ${generateEducationHTML()}
-                </div>
-                
-                <div class="resume-section">
-                    <h2>Skills</h2>
-                    ${generateSkillsHTML()}
-                </div>
-                
-                <div class="resume-section">
-                    <h2>Projects</h2>
-                    ${generateProjectsHTML()}
-                </div>
-            </div>
-        `;
-        
-        resumePreview.innerHTML = resumeHTML;
-        resumePreview.style.display = 'block';
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Adding resume content to PDF
+        doc.setFontSize(20);
+        doc.text(resumeData.personalInfo.name, 10, 10);
+        doc.setFontSize(12);
+        doc.text(`Email: ${resumeData.personalInfo.email}`, 10, 20);
+        doc.text(`Phone: ${resumeData.personalInfo.phone}`, 10, 30);
+
+        // Adding experiences
+        let yOffset = 40;
+        resumeData.experiences.forEach(exp => {
+            doc.setFontSize(14);
+            doc.text(exp.jobTitle, 10, yOffset);
+            doc.setFontSize(12);
+            doc.text(exp.company, 10, yOffset + 10);
+            doc.text(`${formatDate(exp.startDate)} - ${formatDate(exp.endDate)}`, 10, yOffset + 20);
+            doc.text(exp.description, 10, yOffset + 30);
+            yOffset += 40;
+        });
+
+        // Save PDF
+        doc.save('resume.pdf');
     }
-    
+
+    async function generateResumeDocx() {
+        const { Document, Packer, Paragraph, TextRun } = docx;
+        const doc = new Document();
+
+        // Adding resume content to Word document
+        doc.addSection({
+            children: [
+                new Paragraph({
+                    children: [
+                        new TextRun({ text: resumeData.personalInfo.name, bold: true, size: 40 })
+                    ]
+                }),
+                new Paragraph({
+                    children: [
+                        new TextRun(`Email: ${resumeData.personalInfo.email}`),
+                        new TextRun(`Phone: ${resumeData.personalInfo.phone}`)
+                    ]
+                }),
+                ...resumeData.experiences.map(exp => {
+                    return new Paragraph({
+                        children: [
+                            new TextRun({ text: exp.jobTitle, bold: true, size: 28 }),
+                            new TextRun(exp.company),
+                            new TextRun(`${formatDate(exp.startDate)} - ${formatDate(exp.endDate)}`),
+                            new TextRun(exp.description)
+                        ]
+                    });
+                })
+            ]
+        });
+
+        // Save Word document
+        const buffer = await Packer.toBlob(doc);
+        saveAs(buffer, 'resume.docx');
+    }
+
+
     // Download functionality
     document.getElementById('downloadPDF').addEventListener('click', function() {
         const element = document.getElementById('resumePreview');
