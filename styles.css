@@ -1,0 +1,63 @@
+.template-btn {
+    @apply bg-gray-300 text-gray-700 px-4 py-2 rounded transition duration-300;
+}
+
+.template-btn.active {
+    @apply bg-blue-500 text-white;
+}
+
+.btn-add {
+    @apply bg-green-500 text-white px-4 py-2 rounded mt-2 hover:bg-green-600 transition duration-300;
+}
+
+.btn-download {
+    @apply text-white px-6 py-3 rounded text-lg font-semibold transition duration-300 mr-4;
+}
+
+.form-input {
+    @apply w-full px-3 py-2 border rounded mb-2;
+}
+
+.skill-tag {
+    @apply bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm mr-2 mb-2;
+}
+
+.remove-btn {
+    @apply text-red-500 hover:text-red-700 ml-2 cursor-pointer;
+}
+
+#resumePreview {
+    font-family: 'Arial', sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#resumePreview h1 {
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+#resumePreview h2 {
+    color: #3498db;
+    margin-top: 20px;
+}
+
+#resumePreview p {
+    margin-bottom: 10px;
+}
+
+#resumePreview ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+#resumePreview li {
+    margin-bottom: 5px;
+}
+
+.resume-section {
+    margin-bottom: 20px;
+}
