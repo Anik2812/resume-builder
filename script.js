@@ -3,12 +3,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const addExperienceBtn = document.getElementById('addExperience');
     const addEducationBtn = document.getElementById('addEducation');
     const addSkillBtn = document.getElementById('addSkill');
+    const skillInput = document.getElementById('skillInput');
     const addProjectBtn = document.getElementById('addProject');
     const downloadPDFBtn = document.getElementById('downloadPDF');
     const downloadWordBtn = document.getElementById('downloadWord');
     const templateBtns = document.querySelectorAll('.template-btn');
+    const colorBtns = document.querySelectorAll('.color-btn');
+    const progressBar = document.querySelector('.progress');
 
     let selectedTemplate = 'modern';
+    let selectedColor = 'blue';
+
+    // Initialize tooltips
+    tippy('[data-tippy-content]');
 
     // Template selection
     templateBtns.forEach(btn => {
@@ -16,6 +23,15 @@ document.addEventListener('DOMContentLoaded', function() {
             templateBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             selectedTemplate = this.dataset.template;
+            updateResume();
+        });
+    });
+
+    // Color selection
+    colorBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            selectedColor = this.dataset.color;
+            updateResume();
         });
     });
 
@@ -23,6 +39,12 @@ document.addEventListener('DOMContentLoaded', function() {
     addExperienceBtn.addEventListener('click', addExperience);
     addEducationBtn.addEventListener('click', addEducation);
     addSkillBtn.addEventListener('click', addSkill);
+    skillInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addSkill();
+        }
+    });
     addProjectBtn.addEventListener('click', addProject);
 
     // Form submission
@@ -35,11 +57,25 @@ document.addEventListener('DOMContentLoaded', function() {
     downloadPDFBtn.addEventListener('click', downloadPDF);
     downloadWordBtn.addEventListener('click', downloadWord);
 
+    // Real-time preview
+    form.addEventListener('input', updateResume);
+
+    // Drag and drop functionality
+    const sections = document.querySelectorAll('.resume-section');
+    sections.forEach(section => {
+        new Sortable(section, {
+            handle: '.drag-handle',
+            animation: 150,
+            onEnd: updateResume
+        });
+    });
+
     function addExperience() {
         const experienceEntries = document.getElementById('experienceEntries');
         const entry = document.createElement('div');
         entry.classList.add('experience-entry', 'mb-4');
         entry.innerHTML = `
+            <div class="drag-handle">↕</div>
             <input type="text" name="company" placeholder="Company Name" class="form-input">
             <input type="text" name="position" placeholder="Position" class="form-input">
             <input type="text" name="duration" placeholder="Duration" class="form-input">
@@ -49,7 +85,9 @@ document.addEventListener('DOMContentLoaded', function() {
         experienceEntries.appendChild(entry);
         entry.querySelector('.remove-btn').addEventListener('click', function() {
             experienceEntries.removeChild(entry);
+            updateResume();
         });
+        updateResume();
     }
 
     function addEducation() {
@@ -57,6 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const entry = document.createElement('div');
         entry.classList.add('education-entry', 'mb-4');
         entry.innerHTML = `
+            <div class="drag-handle">↕</div>
             <input type="text" name="institution" placeholder="Institution" class="form-input">
             <input type="text" name="degree" placeholder="Degree" class="form-input">
             <input type="text" name="year" placeholder="Year" class="form-input">
@@ -65,7 +104,9 @@ document.addEventListener('DOMContentLoaded', function() {
         educationEntries.appendChild(entry);
         entry.querySelector('.remove-btn').addEventListener('click', function() {
             educationEntries.removeChild(entry);
+            updateResume();
         });
+        updateResume();
     }
 
     function addSkill() {
@@ -80,10 +121,12 @@ document.addEventListener('DOMContentLoaded', function() {
             removeBtn.classList.add('remove-btn');
             removeBtn.addEventListener('click', function() {
                 skillsEntries.removeChild(skillTag);
+                updateResume();
             });
             skillTag.appendChild(removeBtn);
             skillsEntries.appendChild(skillTag);
             skillInput.value = '';
+            updateResume();
         }
     }
 
@@ -92,6 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const entry = document.createElement('div');
         entry.classList.add('project-entry', 'mb-4');
         entry.innerHTML = `
+            <div class="drag-handle">↕</div>
             <input type="text" name="projectTitle" placeholder="Project Title" class="form-input">
             <textarea name="projectDescription" placeholder="Description" rows="3" class="form-input"></textarea>
             <input type="text" name="projectTechnologies" placeholder="Technologies Used" class="form-input">
@@ -100,7 +144,21 @@ document.addEventListener('DOMContentLoaded', function() {
         projectEntries.appendChild(entry);
         entry.querySelector('.remove-btn').addEventListener('click', function() {
             projectEntries.removeChild(entry);
+            updateResume();
         });
+        updateResume();
+    }
+
+    function updateResume() {
+        generateResume();
+        updateProgressBar();
+    }
+
+    function updateProgressBar() {
+        const totalFields = form.querySelectorAll('input, textarea').length;
+        const filledFields = form.querySelectorAll('input:not(:placeholder-shown), textarea:not(:placeholder-shown)').length;
+        const progress = (filledFields / totalFields) * 100;
+        progressBar.style.width = `${progress}%`;
     }
 
     function generateResume() {
@@ -108,32 +166,32 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(form);
         
         let resumeHTML = `
-            <div class="resume-${selectedTemplate}">
-                <h1>${formData.get('name')}</h1>
-                <p>${formData.get('email')} | ${formData.get('phone')} | ${formData.get('location')}</p>
+            <div class="resume-${selectedTemplate} text-${selectedColor}-600">
+                <h1 class="text-4xl font-bold mb-2">${formData.get('name')}</h1>
+                <p class="mb-4">${formData.get('email')} | ${formData.get('phone')} | ${formData.get('location')}</p>
                 
                 <div class="resume-section">
-                    <h2>Professional Summary</h2>
+                    <h2 class="text-2xl font-semibold mb-2">Professional Summary</h2>
                     <p>${formData.get('summary')}</p>
                 </div>
                 
                 <div class="resume-section">
-                    <h2>Work Experience</h2>
+                    <h2 class="text-2xl font-semibold mb-2">Work Experience</h2>
                     ${generateExperienceHTML()}
                 </div>
                 
                 <div class="resume-section">
-                    <h2>Education</h2>
+                    <h2 class="text-2xl font-semibold mb-2">Education</h2>
                     ${generateEducationHTML()}
                 </div>
                 
                 <div class="resume-section">
-                    <h2>Skills</h2>
+                    <h2 class="text-2xl font-semibold mb-2">Skills</h2>
                     ${generateSkillsHTML()}
                 </div>
                 
                 <div class="resume-section">
-                    <h2>Projects</h2>
+                    <h2 class="text-2xl font-semibold mb-2">Projects</h2>
                     ${generateProjectsHTML()}
                 </div>
             </div>
@@ -146,9 +204,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function generateExperienceHTML() {
         const experiences = document.querySelectorAll('.experience-entry');
         return Array.from(experiences).map(exp => `
-            <div>
-                <h3>${exp.querySelector('[name="company"]').value}</h3>
-                <p>${exp.querySelector('[name="position"]').value} | ${exp.querySelector('[name="duration"]').value}</p>
+            <div class="mb-4">
+                <h3 class="text-xl font-semibold">${exp.querySelector('[name="company"]').value}</h3>
+                <p class="italic">${exp.querySelector('[name="position"]').value} | ${exp.querySelector('[name="duration"]').value}</p>
                 <p>${exp.querySelector('[name="responsibilities"]').value}</p>
             </div>
         `).join('');
@@ -157,8 +215,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function generateEducationHTML() {
         const educations = document.querySelectorAll('.education-entry');
         return Array.from(educations).map(edu => `
-            <div>
-                <h3>${edu.querySelector('[name="institution"]').value}</h3>
+            <div class="mb-4">
+                <h3 class="text-xl font-semibold">${edu.querySelector('[name="institution"]').value}</h3>
                 <p>${edu.querySelector('[name="degree"]').value} | ${edu.querySelector('[name="year"]').value}</p>
             </div>
         `).join('');
@@ -166,16 +224,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function generateSkillsHTML() {
         const skills = document.querySelectorAll('.skill-tag');
-        return `<ul>${Array.from(skills).map(skill => `<li>${skill.textContent.replace('×', '')}</li>`).join('')}</ul>`;
+        return `<ul class="list-disc list-inside">${Array.from(skills).map(skill => `<li>${skill.textContent.replace('×', '')}</li>`).join('')}</ul>`;
     }
 
     function generateProjectsHTML() {
         const projects = document.querySelectorAll('.project-entry');
         return Array.from(projects).map(proj => `
-            <div>
-                <h3>${proj.querySelector('[name="projectTitle"]').value}</h3>
+            <div class="mb-4">
+                <h3 class="text-xl font-semibold">${proj.querySelector('[name="projectTitle"]').value}</h3>
                 <p>${proj.querySelector('[name="projectDescription"]').value}</p>
-                <p>Technologies: ${proj.querySelector('[name="projectTechnologies"]').value}</p>
+                <p class="italic">Technologies: ${proj.querySelector('[name="projectTechnologies"]').value}</p>
             </div>
         `).join('');
     }
@@ -330,4 +388,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return content;
     }
+
+    // Initialize
+    addExperience();
+    addEducation();
+    updateProgressBar();
 });
