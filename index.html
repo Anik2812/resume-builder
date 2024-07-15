@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazing Resume Builder</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #4a4a4a;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #764ba2;
+        }
+        .resume {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .resume h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .resume .section {
+            margin-bottom: 20px;
+        }
+        .resume .section h3 {
+            color: #4a4a4a;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Amazing Resume Builder</h1>
+        <form id="resumeForm">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone">
+            </div>
+            <div class="form-group">
+                <label for="summary">Professional Summary</label>
+                <textarea id="summary" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="experience">Work Experience</label>
+                <textarea id="experience" rows="4" placeholder="Company Name, Position, Duration, Responsibilities"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="education">Education</label>
+                <textarea id="education" rows="4" placeholder="Institution, Degree, Year"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="skills">Skills</label>
+                <textarea id="skills" rows="4" placeholder="List your skills"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="projects">Projects</label>
+                <textarea id="projects" rows="4" placeholder="Project Title, Description, Technologies Used"></textarea>
+            </div>
+            <button type="submit">Generate Resume</button>
+        </form>
+        <div class="resume" id="resume" style="display:none;">
+            <h2>Generated Resume</h2>
+            <div class="section" id="resumeName"></div>
+            <div class="section" id="resumeEmail"></div>
+            <div class="section" id="resumePhone"></div>
+            <div class="section" id="resumeSummary">
+                <h3>Professional Summary</h3>
+                <p></p>
+            </div>
+            <div class="section" id="resumeExperience">
+                <h3>Work Experience</h3>
+                <p></p>
+            </div>
+            <div class="section" id="resumeEducation">
+                <h3>Education</h3>
+                <p></p>
+            </div>
+            <div class="section" id="resumeSkills">
+                <h3>Skills</h3>
+                <p></p>
+            </div>
+            <div class="section" id="resumeProjects">
+                <h3>Projects</h3>
+                <p></p>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('resumeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Collect form values
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const summary = document.getElementById('summary').value;
+            const experience = document.getElementById('experience').value;
+            const education = document.getElementById('education').value;
+            const skills = document.getElementById('skills').value;
+            const projects = document.getElementById('projects').value;
+
+            // Display resume
+            document.getElementById('resumeName').innerHTML = `<h3>${name}</h3>`;
+            document.getElementById('resumeEmail').innerHTML = `<strong>Email:</strong> ${email}`;
+            document.getElementById('resumePhone').innerHTML = `<strong>Phone:</strong> ${phone}`;
+            document.getElementById('resumeSummary').querySelector('p').textContent = summary;
+            document.getElementById('resumeExperience').querySelector('p').textContent = experience;
+            document.getElementById('resumeEducation').querySelector('p').textContent = education;
+            document.getElementById('resumeSkills').querySelector('p').textContent = skills;
+            document.getElementById('resumeProjects').querySelector('p').textContent = projects;
+
+            document.getElementById('resume').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
