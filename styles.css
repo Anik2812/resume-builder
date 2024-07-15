@@ -1,26 +1,37 @@
 body {
+    font-family: 'Poppins', sans-serif;
     transition: background-color 0.5s ease;
+    @apply bg-gradient-to-br from-gray-900 to-blue-900 text-gray-200;
 }
 
 .container {
     max-width: 1200px;
+    @apply mx-auto p-8;
 }
 
-.template-btn, .btn-add, .btn-primary, .btn-download {
-    @apply px-4 py-2 rounded transition-all duration-300 text-white font-semibold;
+h1 {
+    @apply text-5xl font-bold text-center text-blue-400 mb-8 animate__animated animate__fadeIn;
+}
+
+h2 {
+    @apply text-2xl font-semibold mb-2;
+}
+
+.template-btn, .btn-add, .btn-primary, .btn-download, .layout-btn {
+    @apply px-4 py-2 rounded-full transition-all duration-300 text-white font-semibold;
     transform: translateY(0);
 }
 
-.template-btn:hover, .btn-add:hover, .btn-primary:hover, .btn-download:hover {
+.template-btn:hover, .btn-add:hover, .btn-primary:hover, .btn-download:hover, .layout-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-.template-btn {
+.template-btn, .layout-btn {
     @apply bg-gray-700 text-gray-300;
 }
 
-.template-btn.active {
+.template-btn.active, .layout-btn.active {
     @apply bg-blue-500 text-white;
 }
 
@@ -46,18 +57,18 @@ body {
 
 .form-group input,
 .form-group textarea {
-    @apply w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded;
+    @apply w-full px-3 py-2 bg-gray-700 text-white border-2 border-gray-600 rounded-lg;
     transition: all 0.3s ease;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
-    @apply outline-none ring-2 ring-blue-500;
+    @apply outline-none ring-2 ring-blue-500 border-blue-500;
     transform: scale(1.02);
 }
 
 .skill-tag {
-    @apply bg-blue-600 text-white px-2 py-1 rounded text-sm mr-2 mb-2 inline-block;
+    @apply bg-blue-600 text-white px-2 py-1 rounded-full text-sm mr-2 mb-2 inline-block;
     transition: all 0.3s ease;
 }
 
@@ -95,13 +106,12 @@ body {
 }
 
 #resumePreview {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Poppins', sans-serif;
     max-width: 800px;
     margin: 0 auto;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     transition: all 0.5s ease;
-    background-color: white;
-    color: #333;
+    @apply bg-white text-gray-800 p-6 rounded-lg;
 }
 
 #resumePreview:hover {
@@ -142,7 +152,7 @@ body {
 }
 
 .drag-handle {
-    @apply cursor-move p-1 mr-2 bg-gray-600 rounded;
+    @apply cursor-move p-1 mr-2 bg-gray-600 rounded-full text-white;
 }
 
 .experience-entry,
@@ -179,7 +189,7 @@ body {
 
 /* Template-specific styles */
 .modern {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
 .classic {
@@ -195,3 +205,79 @@ body {
 .green h1, .green h2 { color: #2ecc71; }
 .red h1, .red h2 { color: #e74c3c; }
 .purple h1, .purple h2 { color: #9b59b6; }
+
+/* Layout styles */
+.two-column {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.two-column .resume-section:nth-child(odd) {
+    grid-column: 1;
+}
+
+.two-column .resume-section:nth-child(even) {
+    grid-column: 2;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        padding: 4rem 2rem;
+    }
+
+    h1 {
+        @apply text-4xl;
+    }
+
+    .two-column {
+        grid-template-columns: 1fr;
+    }
+
+    .two-column .resume-section:nth-child(odd),
+    .two-column .resume-section:nth-child(even) {
+        grid-column: 1;
+    }
+
+    .btn-download {
+        @apply w-full mb-2;
+    }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Focus styles for better keyboard navigation */
+button:focus,
+input:focus,
+textarea:focus,
+select:focus {
+    @apply outline-none ring-2 ring-blue-500;
+}
+
+/* Print styles */
+@media print {
+    body {
+        @apply bg-white text-black;
+    }
+
+    .container {
+        @apply w-full max-w-none p-0;
+    }
+
+    #resumePreview {
+        @apply shadow-none;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+}
