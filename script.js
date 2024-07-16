@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Global variables
+
     let resumeData = {
         personalInfo: {},
         experiences: [],
@@ -427,14 +427,40 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function generatePDF(data) {
-        // This is a placeholder for PDF generation
-        // In a real application, you would use a library like jsPDF or pdfmake
-        // or send the data to a server-side API for PDF generation
-        console.log("Generating PDF with data:", data);
-        alert("PDF generation would happen here. Check the console for the data that would be used.");
+        const element = document.getElementById('resumePreview');
+        html2canvas(element).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF();
+            const imgProps= pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save('resume.pdf');
+        });
     }
     
-    // Initialize drag and drop functionality
+    function downloadWord() {
+        const doc = new docx.Document();
+        
+        // Add content to the Word document based on resumeData
+        doc.addParagraph(new docx.Paragraph(resumeData.personalInfo.name).title());
+        doc.addParagraph(new docx.Paragraph(resumeData.personalInfo.email));
+        doc.addParagraph(new docx.Paragraph(resumeData.personalInfo.phone));
+        
+        // Add more sections (experience, education, etc.) here
+        
+        docx.Packer.toBlob(doc).then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            document.body.appendChild(a);
+            a.style = 'display: none';
+            a.href = url;
+            a.download = 'resume.docx';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        });
+    }
+
     function initDragAndDrop() {
         const containers = document.querySelectorAll('#experienceEntries, #educationEntries, #projectEntries');
         containers.forEach(container => {
@@ -448,27 +474,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-    
-    // Initialize tooltips
+
     function initTooltips() {
         tippy('[data-tippy-content]', {
             arrow: true,
             placement: 'top',
         });
     }
-    
-    // Initialize the application
-    function init() {
-        updateResumePreview();
-        updateProgress();
-        updateATSScore();
-        initDragAndDrop();
-        initTooltips();
-    }
-    
-    // Call init when the DOM is fully loaded
-    document.addEventListener('DOMContentLoaded', init);
-    
+
     // Export functionality
     document.getElementById('exportJSON').addEventListener('click', function() {
         const jsonData = JSON.stringify(resumeData, null, 2);
@@ -564,5 +577,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Call init to set up the application
+    // Initialize the application
+    function init() {
+        updateResumePreview();
+        updateProgress();
+        updateATSScore();
+        initDragAndDrop();
+        initTooltips();
+    }
+    
+        // Event listeners for download buttons
+    document.getElementById('downloadPDF').addEventListener('click', generateResume);
+    document.getElementById('downloadWord').addEventListener('click', downloadWord);
+    document.getElementById('downloadATS').addEventListener('click', () => {
+        alert('ATS-friendly version download functionality to be implemented');
+    });
     init();
+});
