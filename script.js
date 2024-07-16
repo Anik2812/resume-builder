@@ -201,8 +201,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateResumePreview() {
         const preview = document.getElementById('resumePreview');
-        const template = document.querySelector('.template-btn.active').getAttribute('data-template');
-        const layout = document.querySelector('.layout-btn.active').getAttribute('data-layout');
+        const activeTemplate = document.querySelector('.template-btn.active');
+        const activeLayout = document.querySelector('.layout-btn.active');
+
+        const template = activeTemplate ? activeTemplate.getAttribute('data-template') : 'default-template';
+        const layout = activeLayout ? activeLayout.getAttribute('data-layout') : 'default-layout';
 
         preview.className = `${template} ${layout} bg-white text-gray-800 shadow-2xl rounded-lg p-6 transform hover:scale-105 transition-all duration-300`;
 
@@ -389,9 +392,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function generateResume() {
-        const template = document.querySelector('.template-btn.active').getAttribute('data-template');
-        const layout = document.querySelector('.layout-btn.active').getAttribute('data-layout');
-        const color = document.querySelector('.color-btn.active').getAttribute('data-color');
+        const activeTemplate = document.querySelector('.template-btn.active');
+        const activeLayout = document.querySelector('.layout-btn.active');
+        const activeColor = document.querySelector('.color-btn.active');
+    
+        const template = activeTemplate ? activeTemplate.getAttribute('data-template') : 'default-template';
+        const layout = activeLayout ? activeLayout.getAttribute('data-layout') : 'default-layout';
+        const color = activeColor ? activeColor.getAttribute('data-color') : 'default-color';
     
         // Collect all data
         const experiences = Array.from(document.querySelectorAll('.experience-entry')).map(entry => ({
@@ -429,17 +436,27 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     
         // Generate PDF
-        generatePDF(finalResumeData);
+        try {
+            generatePDF(finalResumeData);
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            alert('There was an error generating the PDF. Please make sure all required libraries are loaded.');
+        }
     }
     
     function generatePDF(data) {
+        if (typeof window.jspdf === 'undefined') {
+            console.error('jsPDF library is not loaded. Make sure to include it in your HTML.');
+            return;
+        }
+    
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF();
+        const doc = new jsPDF();
         const element = document.getElementById('resumePreview');
         
-        pdf.html(element, {
-            callback: function(pdf) {
-                pdf.save('resume.pdf');
+        doc.html(element, {
+            callback: function(doc) {
+                doc.save('resume.pdf');
             },
             x: 15,
             y: 15,
@@ -449,16 +466,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function downloadWord() {
+        if (typeof docx === 'undefined') {
+            console.error('docx library is not loaded. Make sure to include it in your HTML.');
+            return;
+        }
+
         const doc = new docx.Document({
             sections: [{
                 properties: {},
                 children: [
                     new docx.Paragraph({
-                        text: resumeData.personalInfo.name,
+                        text: resumeData.personalInfo.name || 'Your Name',
                         heading: docx.HeadingLevel.HEADING_1
                     }),
                     new docx.Paragraph({
-                        text: `${resumeData.personalInfo.email} | ${resumeData.personalInfo.phone} | ${resumeData.personalInfo.location}`
+                        text: `${resumeData.personalInfo.email || 'email@example.com'} | ${resumeData.personalInfo.phone || 'Phone'} | ${resumeData.personalInfo.location || 'Location'}`
+                    }),
+                    new docx.Paragraph({
+                        text: 'Professional Summary',
+                        heading: docx.HeadingLevel.HEADING_2
+                    }),
+                    new docx.Paragraph({
+                        text: resumeData.personalInfo.summary || 'Your professional summary goes here.'
                     }),
                     // Add more sections (experience, education, etc.) here
                 ]
@@ -475,6 +504,48 @@ document.addEventListener('DOMContentLoaded', function() {
             a.click();
             window.URL.revokeObjectURL(url);
         });
+    }
+
+    function downloadATSFriendly() {
+        // Create a simple text version of the resume
+        let content = `${resumeData.personalInfo.name || 'Your Name'}\n`;
+        content += `${resumeData.personalInfo.email || 'email@example.com'} | ${resumeData.personalInfo.phone || 'Phone'} | ${resumeData.personalInfo.location || 'Location'}\n\n`;
+        content += `Professional Summary:\n${resumeData.personalInfo.summary || 'Your professional summary goes here.'}\n\n`;
+
+        content += `Work Experience:\n`;
+        document.querySelectorAll('.experience-entry').forEach(entry => {
+            content += `${entry.querySelector('[name="jobTitle"]').value} at ${entry.querySelector('[name="company"]').value}\n`;
+            content += `${entry.querySelector('[name="location"]').value} | ${entry.querySelector('[name="startDate"]').value} - ${entry.querySelector('[name="endDate"]').value}\n`;
+            content += `${entry.querySelector('[name="description"]').value}\n\n`;
+        });
+
+        content += `Education:\n`;
+        document.querySelectorAll('.education-entry').forEach(entry => {
+            content += `${entry.querySelector('[name="degree"]').value} - ${entry.querySelector('[name="institution"]').value}\n`;
+            content += `${entry.querySelector('[name="location"]').value} | Graduated: ${entry.querySelector('[name="graduationDate"]').value}\n\n`;
+        });
+
+        content += `Skills:\n${resumeData.skills.join(', ')}\n\n`;
+
+        content += `Projects:\n`;
+        document.querySelectorAll('.project-entry').forEach(entry => {
+            content += `${entry.querySelector('[name="projectName"]').value}\n`;
+            content += `${entry.querySelector('[name="projectDescription"]').value}\n`;
+            content += `Technologies: ${entry.querySelector('[name="technologies"]').value}\n\n`;
+        });
+
+        // Create a Blob with the content
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+
+        // Create a link and trigger the download
+        const a = document.createElement('a');
+        document.body.appendChild(a);
+        a.style = 'display: none';
+        a.href = url;
+        a.download = 'resume_ats_friendly.txt';
+        a.click();
+        window.URL.revokeObjectURL(url);
     }
 
     function initDragAndDrop() {
@@ -502,9 +573,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event listeners for download buttons
     document.getElementById('downloadPDF').addEventListener('click', generateResume);
     document.getElementById('downloadWord').addEventListener('click', downloadWord);
-    document.getElementById('downloadATS').addEventListener('click', () => {
-        alert('ATS-friendly version download functionality to be implemented');
-    });
+    document.getElementById('downloadATS').addEventListener('click', downloadATSFriendly);
 
     init();
 });
+    
