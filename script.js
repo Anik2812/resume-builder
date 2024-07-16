@@ -383,113 +383,186 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function generateResume() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        // Adding resume content to PDF
-        doc.setFontSize(20);
-        doc.text(resumeData.personalInfo.name, 10, 10);
-        doc.setFontSize(12);
-        doc.text(`Email: ${resumeData.personalInfo.email}`, 10, 20);
-        doc.text(`Phone: ${resumeData.personalInfo.phone}`, 10, 30);
-
-        // Adding experiences
-        let yOffset = 40;
-        resumeData.experiences.forEach(exp => {
-            doc.setFontSize(14);
-            doc.text(exp.jobTitle, 10, yOffset);
-            doc.setFontSize(12);
-            doc.text(exp.company, 10, yOffset + 10);
-            doc.text(`${formatDate(exp.startDate)} - ${formatDate(exp.endDate)}`, 10, yOffset + 20);
-            doc.text(exp.description, 10, yOffset + 30);
-            yOffset += 40;
-        });
-
-        // Save PDF
-        doc.save('resume.pdf');
+        const template = document.querySelector('.template-btn.active').getAttribute('data-template');
+        const layout = document.querySelector('.layout-btn.active').getAttribute('data-layout');
+        const color = document.querySelector('.color-btn.active').getAttribute('data-color');
+    
+        // Collect all data
+        const experiences = Array.from(document.querySelectorAll('.experience-entry')).map(entry => ({
+            jobTitle: entry.querySelector('[name="jobTitle"]').value,
+            company: entry.querySelector('[name="company"]').value,
+            location: entry.querySelector('[name="location"]').value,
+            startDate: entry.querySelector('[name="startDate"]').value,
+            endDate: entry.querySelector('[name="endDate"]').value,
+            description: entry.querySelector('[name="description"]').value
+        }));
+    
+        const education = Array.from(document.querySelectorAll('.education-entry')).map(entry => ({
+            degree: entry.querySelector('[name="degree"]').value,
+            institution: entry.querySelector('[name="institution"]').value,
+            location: entry.querySelector('[name="location"]').value,
+            graduationDate: entry.querySelector('[name="graduationDate"]').value
+        }));
+    
+        const projects = Array.from(document.querySelectorAll('.project-entry')).map(entry => ({
+            name: entry.querySelector('[name="projectName"]').value,
+            description: entry.querySelector('[name="projectDescription"]').value,
+            technologies: entry.querySelector('[name="technologies"]').value
+        }));
+    
+        // Combine all data
+        const finalResumeData = {
+            personalInfo: resumeData.personalInfo,
+            experiences: experiences,
+            education: education,
+            skills: resumeData.skills,
+            projects: projects,
+            template: template,
+            layout: layout,
+            color: color
+        };
+    
+        // Generate PDF
+        generatePDF(finalResumeData);
     }
-
-    async function generateResumeDocx() {
-        const { Document, Packer, Paragraph, TextRun } = docx;
-        const doc = new Document();
-
-        // Adding resume content to Word document
-        doc.addSection({
-            children: [
-                new Paragraph({
-                    children: [
-                        new TextRun({ text: resumeData.personalInfo.name, bold: true, size: 40 })
-                    ]
-                }),
-                new Paragraph({
-                    children: [
-                        new TextRun(`Email: ${resumeData.personalInfo.email}`),
-                        new TextRun(`Phone: ${resumeData.personalInfo.phone}`)
-                    ]
-                }),
-                ...resumeData.experiences.map(exp => {
-                    return new Paragraph({
-                        children: [
-                            new TextRun({ text: exp.jobTitle, bold: true, size: 28 }),
-                            new TextRun(exp.company),
-                            new TextRun(`${formatDate(exp.startDate)} - ${formatDate(exp.endDate)}`),
-                            new TextRun(exp.description)
-                        ]
-                    });
-                })
-            ]
-        });
-
-        // Save Word document
-        const buffer = await Packer.toBlob(doc);
-        saveAs(buffer, 'resume.docx');
+    
+    function generatePDF(data) {
+        // This is a placeholder for PDF generation
+        // In a real application, you would use a library like jsPDF or pdfmake
+        // or send the data to a server-side API for PDF generation
+        console.log("Generating PDF with data:", data);
+        alert("PDF generation would happen here. Check the console for the data that would be used.");
     }
-
-
-    // Download functionality
-    document.getElementById('downloadPDF').addEventListener('click', function() {
-        const element = document.getElementById('resumePreview');
-        html2pdf().from(element).save('resume.pdf');
+    
+    // Initialize drag and drop functionality
+    function initDragAndDrop() {
+        const containers = document.querySelectorAll('#experienceEntries, #educationEntries, #projectEntries');
+        containers.forEach(container => {
+            new Sortable(container, {
+                animation: 150,
+                handle: '.drag-handle',
+                onEnd: () => {
+                    updateResumePreview();
+                    updateATSScore();
+                }
+            });
+        });
+    }
+    
+    // Initialize tooltips
+    function initTooltips() {
+        tippy('[data-tippy-content]', {
+            arrow: true,
+            placement: 'top',
+        });
+    }
+    
+    // Initialize the application
+    function init() {
+        updateResumePreview();
+        updateProgress();
+        updateATSScore();
+        initDragAndDrop();
+        initTooltips();
+    }
+    
+    // Call init when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', init);
+    
+    // Export functionality
+    document.getElementById('exportJSON').addEventListener('click', function() {
+        const jsonData = JSON.stringify(resumeData, null, 2);
+        const blob = new Blob([jsonData], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'resume_data.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     });
-
-    document.getElementById('downloadWord').addEventListener('click', function() {
-        const content = document.getElementById('resumePreview').innerHTML;
-        const converted = htmlDocx.asBlob(content);
-        saveAs(converted, 'resume.docx');
-    });
-
-    document.getElementById('downloadATS').addEventListener('click', function() {
-        const content = document.getElementById('resumePreview').innerText;
-        const blob = new Blob([content], { type: 'text/plain' });
-        saveAs(blob, 'resume_ATS.txt');
-    });
-
-    // Initialize Sortable for drag-and-drop functionality
-    new Sortable(document.getElementById('experienceEntries'), {
-        animation: 150,
-        handle: '.drag-handle',
-        onEnd: function() {
-            updateResumePreview();
+    
+    // Import functionality
+    document.getElementById('importJSON').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    resumeData = importedData;
+                    populateFormFromImport(importedData);
+                    updateResumePreview();
+                    updateProgress();
+                    updateATSScore();
+                } catch (error) {
+                    console.error('Error parsing imported JSON:', error);
+                    alert('Error importing data. Please check the file format.');
+                }
+            };
+            reader.readAsText(file);
         }
     });
-
-    new Sortable(document.getElementById('educationEntries'), {
-        animation: 150,
-        handle: '.drag-handle',
-        onEnd: function() {
-            updateResumePreview();
+    
+    function populateFormFromImport(data) {
+        // Populate personal info
+        for (const [key, value] of Object.entries(data.personalInfo)) {
+            const input = document.querySelector(`#resumeForm [name="${key}"]`);
+            if (input) input.value = value;
         }
-    });
-
-    new Sortable(document.getElementById('projectEntries'), {
-        animation: 150,
-        handle: '.drag-handle',
-        onEnd: function() {
+    
+        // Populate experiences
+        const experienceEntries = document.getElementById('experienceEntries');
+        experienceEntries.innerHTML = '';
+        data.experiences.forEach(exp => {
+            const entry = createExperienceEntry();
+            entry.querySelector('[name="jobTitle"]').value = exp.jobTitle;
+            entry.querySelector('[name="company"]').value = exp.company;
+            entry.querySelector('[name="location"]').value = exp.location;
+            entry.querySelector('[name="startDate"]').value = exp.startDate;
+            entry.querySelector('[name="endDate"]').value = exp.endDate;
+            entry.querySelector('[name="description"]').value = exp.description;
+            experienceEntries.appendChild(entry);
+        });
+    
+        // Populate education
+        const educationEntries = document.getElementById('educationEntries');
+        educationEntries.innerHTML = '';
+        data.education.forEach(edu => {
+            const entry = createEducationEntry();
+            entry.querySelector('[name="degree"]').value = edu.degree;
+            entry.querySelector('[name="institution"]').value = edu.institution;
+            entry.querySelector('[name="location"]').value = edu.location;
+            entry.querySelector('[name="graduationDate"]').value = edu.graduationDate;
+            educationEntries.appendChild(entry);
+        });
+    
+        // Populate skills
+        const skillsEntries = document.getElementById('skillsEntries');
+        skillsEntries.innerHTML = '';
+        data.skills.forEach(skill => addSkill(skill));
+    
+        // Populate projects
+        const projectEntries = document.getElementById('projectEntries');
+        projectEntries.innerHTML = '';
+        data.projects.forEach(project => {
+            const entry = createProjectEntry();
+            entry.querySelector('[name="projectName"]').value = project.name;
+            entry.querySelector('[name="projectDescription"]').value = project.description;
+            entry.querySelector('[name="technologies"]').value = project.technologies;
+            projectEntries.appendChild(entry);
+        });
+    }
+    
+    // Add event listeners for real-time updates
+    document.querySelectorAll('#resumeForm input, #resumeForm textarea').forEach(input => {
+        input.addEventListener('input', () => {
             updateResumePreview();
-        }
+            updateProgress();
+            updateATSScore();
+        });
     });
-
-    // Initial update
-    updateResumePreview();
-    updateProgress();
-});
+    
+    // Call init to set up the application
+    init();
