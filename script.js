@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-
     let resumeData = {
         personalInfo: {},
         experiences: [],
@@ -23,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     colorButtons.forEach(button => {
         button.addEventListener('click', function() {
             const color = this.getAttribute('data-color');
-            document.getElementById('resumePreview').className = color;
+            document.getElementById('resumePreview').className = `bg-white text-gray-800 shadow-2xl rounded-lg p-6 transform hover:scale-105 transition-all duration-300 ${color}`;
             updateResumePreview();
         });
     });
@@ -205,14 +204,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const template = document.querySelector('.template-btn.active').getAttribute('data-template');
         const layout = document.querySelector('.layout-btn.active').getAttribute('data-layout');
 
-        preview.className = `${template} ${layout}`;
+        preview.className = `${template} ${layout} bg-white text-gray-800 shadow-2xl rounded-lg p-6 transform hover:scale-105 transition-all duration-300`;
 
         // Update personal info
         preview.innerHTML = `
-            <h1>${resumeData.personalInfo.name || 'Your Name'}</h1>
-            <p>${resumeData.personalInfo.email || 'email@example.com'} | ${resumeData.personalInfo.phone || 'Phone'} | ${resumeData.personalInfo.location || 'Location'}</p>
-            <h2>Professional Summary</h2>
-            <p>${resumeData.personalInfo.summary || 'Your professional summary goes here.'}</p>
+            <h1 class="text-4xl font-bold mb-2">${resumeData.personalInfo.name || 'Your Name'}</h1>
+            <p class="text-lg mb-4">${resumeData.personalInfo.email || 'email@example.com'} | ${resumeData.personalInfo.phone || 'Phone'} | ${resumeData.personalInfo.location || 'Location'}</p>
+            <h2 class="text-2xl font-semibold mt-6 mb-2">Professional Summary</h2>
+            <p class="mb-4">${resumeData.personalInfo.summary || 'Your professional summary goes here.'}</p>
         `;
 
         // Update experiences
@@ -227,12 +226,14 @@ document.addEventListener('DOMContentLoaded', function() {
             };
         });
         if (experiences.length > 0) {
-            preview.innerHTML += `<h2>Work Experience</h2>`;
+            preview.innerHTML += `<h2 class="text-2xl font-semibold mt-6 mb-2">Work Experience</h2>`;
             experiences.forEach(exp => {
                 preview.innerHTML += `
-                    <h3>${exp.jobTitle} at ${exp.company}</h3>
-                    <p>${exp.location} | ${formatDate(exp.startDate)} - ${formatDate(exp.endDate)}</p>
-                    <p>${exp.description}</p>
+                    <div class="mb-4">
+                        <h3 class="text-xl font-semibold">${exp.jobTitle} at ${exp.company}</h3>
+                        <p class="text-sm text-gray-600">${exp.location} | ${formatDate(exp.startDate)} - ${formatDate(exp.endDate)}</p>
+                        <p class="mt-2">${exp.description}</p>
+                    </div>
                 `;
             });
         }
@@ -247,22 +248,25 @@ document.addEventListener('DOMContentLoaded', function() {
             };
         });
         if (education.length > 0) {
-            preview.innerHTML += `<h2>Education</h2>`;
+            preview.innerHTML += `<h2 class="text-2xl font-semibold mt-6 mb-2">Education</h2>`;
             education.forEach(edu => {
                 preview.innerHTML += `
-                    <h3>${edu.degree} - ${edu.institution}</h3>
-                    <p>${edu.location} | Graduated: ${formatDate(edu.graduationDate)}</p>
+                    <div class="mb-4">
+                        <h3 class="text-xl font-semibold">${edu.degree} - ${edu.institution}</h3>
+                        <p class="text-sm text-gray-600">${edu.location} | Graduated: ${formatDate(edu.graduationDate)}</p>
+                    </div>
                 `;
             });
         }
 
         // Update skills
         if (resumeData.skills.length > 0) {
-            preview.innerHTML += `<h2>Skills</h2><ul>`;
+            preview.innerHTML += `<h2 class="text-2xl font-semibold mt-6 mb-2">Skills</h2>`;
+            preview.innerHTML += `<div class="flex flex-wrap gap-2">`;
             resumeData.skills.forEach(skill => {
-                preview.innerHTML += `<li>${skill}</li>`;
+                preview.innerHTML += `<span class="bg-gray-200 text-gray-800 px-2 py-1 rounded">${skill}</span>`;
             });
-            preview.innerHTML += `</ul>`;
+            preview.innerHTML += `</div>`;
         }
 
         // Update projects
@@ -274,12 +278,14 @@ document.addEventListener('DOMContentLoaded', function() {
             };
         });
         if (projects.length > 0) {
-            preview.innerHTML += `<h2>Projects</h2>`;
+            preview.innerHTML += `<h2 class="text-2xl font-semibold mt-6 mb-2">Projects</h2>`;
             projects.forEach(project => {
                 preview.innerHTML += `
-                    <h3>${project.name}</h3>
-                    <p>${project.description}</p>
-                    <p>Technologies: ${project.technologies}</p>
+                    <div class="mb-4">
+                        <h3 class="text-xl font-semibold">${project.name}</h3>
+                        <p class="mt-2">${project.description}</p>
+                        <p class="text-sm text-gray-600">Technologies: ${project.technologies}</p>
+                    </div>
                 `;
             });
         }
@@ -427,27 +433,37 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function generatePDF(data) {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
         const element = document.getElementById('resumePreview');
-        html2canvas(element).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF();
-            const imgProps= pdf.getImageProperties(imgData);
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-            pdf.save('resume.pdf');
+        
+        pdf.html(element, {
+            callback: function(pdf) {
+                pdf.save('resume.pdf');
+            },
+            x: 15,
+            y: 15,
+            width: 170,
+            windowWidth: 650
         });
     }
     
     function downloadWord() {
-        const doc = new docx.Document();
-        
-        // Add content to the Word document based on resumeData
-        doc.addParagraph(new docx.Paragraph(resumeData.personalInfo.name).title());
-        doc.addParagraph(new docx.Paragraph(resumeData.personalInfo.email));
-        doc.addParagraph(new docx.Paragraph(resumeData.personalInfo.phone));
-        
-        // Add more sections (experience, education, etc.) here
+        const doc = new docx.Document({
+            sections: [{
+                properties: {},
+                children: [
+                    new docx.Paragraph({
+                        text: resumeData.personalInfo.name,
+                        heading: docx.HeadingLevel.HEADING_1
+                    }),
+                    new docx.Paragraph({
+                        text: `${resumeData.personalInfo.email} | ${resumeData.personalInfo.phone} | ${resumeData.personalInfo.location}`
+                    }),
+                    // Add more sections (experience, education, etc.) here
+                ]
+            }]
+        });
         
         docx.Packer.toBlob(doc).then(blob => {
             const url = window.URL.createObjectURL(blob);
@@ -475,122 +491,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function initTooltips() {
-        tippy('[data-tippy-content]', {
-            arrow: true,
-            placement: 'top',
-        });
-    }
-
-    // Export functionality
-    document.getElementById('exportJSON').addEventListener('click', function() {
-        const jsonData = JSON.stringify(resumeData, null, 2);
-        const blob = new Blob([jsonData], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'resume_data.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    });
-    
-    // Import functionality
-    document.getElementById('importJSON').addEventListener('change', function(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedData = JSON.parse(e.target.result);
-                    resumeData = importedData;
-                    populateFormFromImport(importedData);
-                    updateResumePreview();
-                    updateProgress();
-                    updateATSScore();
-                } catch (error) {
-                    console.error('Error parsing imported JSON:', error);
-                    alert('Error importing data. Please check the file format.');
-                }
-            };
-            reader.readAsText(file);
-        }
-    });
-    
-    function populateFormFromImport(data) {
-        // Populate personal info
-        for (const [key, value] of Object.entries(data.personalInfo)) {
-            const input = document.querySelector(`#resumeForm [name="${key}"]`);
-            if (input) input.value = value;
-        }
-    
-        // Populate experiences
-        const experienceEntries = document.getElementById('experienceEntries');
-        experienceEntries.innerHTML = '';
-        data.experiences.forEach(exp => {
-            const entry = createExperienceEntry();
-            entry.querySelector('[name="jobTitle"]').value = exp.jobTitle;
-            entry.querySelector('[name="company"]').value = exp.company;
-            entry.querySelector('[name="location"]').value = exp.location;
-            entry.querySelector('[name="startDate"]').value = exp.startDate;
-            entry.querySelector('[name="endDate"]').value = exp.endDate;
-            entry.querySelector('[name="description"]').value = exp.description;
-            experienceEntries.appendChild(entry);
-        });
-    
-        // Populate education
-        const educationEntries = document.getElementById('educationEntries');
-        educationEntries.innerHTML = '';
-        data.education.forEach(edu => {
-            const entry = createEducationEntry();
-            entry.querySelector('[name="degree"]').value = edu.degree;
-            entry.querySelector('[name="institution"]').value = edu.institution;
-            entry.querySelector('[name="location"]').value = edu.location;
-            entry.querySelector('[name="graduationDate"]').value = edu.graduationDate;
-            educationEntries.appendChild(entry);
-        });
-    
-        // Populate skills
-        const skillsEntries = document.getElementById('skillsEntries');
-        skillsEntries.innerHTML = '';
-        data.skills.forEach(skill => addSkill(skill));
-    
-        // Populate projects
-        const projectEntries = document.getElementById('projectEntries');
-        projectEntries.innerHTML = '';
-        data.projects.forEach(project => {
-            const entry = createProjectEntry();
-            entry.querySelector('[name="projectName"]').value = project.name;
-            entry.querySelector('[name="projectDescription"]').value = project.description;
-            entry.querySelector('[name="technologies"]').value = project.technologies;
-            projectEntries.appendChild(entry);
-        });
-    }
-    
-    // Add event listeners for real-time updates
-    document.querySelectorAll('#resumeForm input, #resumeForm textarea').forEach(input => {
-        input.addEventListener('input', () => {
-            updateResumePreview();
-            updateProgress();
-            updateATSScore();
-        });
-    });
-    
     // Initialize the application
     function init() {
         updateResumePreview();
         updateProgress();
         updateATSScore();
         initDragAndDrop();
-        initTooltips();
     }
     
-        // Event listeners for download buttons
+    // Event listeners for download buttons
     document.getElementById('downloadPDF').addEventListener('click', generateResume);
     document.getElementById('downloadWord').addEventListener('click', downloadWord);
     document.getElementById('downloadATS').addEventListener('click', () => {
         alert('ATS-friendly version download functionality to be implemented');
     });
+
     init();
 });

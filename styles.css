@@ -1,183 +1,311 @@
 /* Base styles */
 :root {
-  --primary-color: #3498db;
-  --secondary-color: #2ecc71;
-  --background-color: #1a202c;
-  --text-color: #ffffff;
-  --input-bg: #2d3748;
-  --input-border: #4a5568;
-  --hover-color: #2980b9;
-}
-
-body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, var(--background-color) 0%, #2d3748 100%);
-  color: var(--text-color);
-  line-height: 1.6;
-  transition: background-color 0.5s ease;
-}
-
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-/* Form elements */
-input, textarea, select {
-  background-color: var(--input-bg);
-  border: 1px solid var(--input-border);
-  color: var(--text-color);
-  padding: 10px;
-  border-radius: 5px;
-  transition: all 0.3s ease;
-}
-
-input:focus, textarea:focus, select:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
-  outline: none;
-}
-
-/* Buttons */
-.btn {
-  padding: 10px 20px;
-  border-radius: 25px;
-  font-weight: 600;
-  text-transform: uppercase;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  border: none;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.btn-primary {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-.btn-secondary {
-  background-color: var(--secondary-color);
-  color: white;
-}
-
-/* Resume preview */
-#resumePreview {
-  background-color: white;
-  color: #333;
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 3rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  transition: all 0.5s ease;
-}
-
-#resumePreview:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-}
-
-#resumePreview h1 {
-  font-size: 2.5rem;
-  color: var(--primary-color);
-  border-bottom: 2px solid var(--primary-color);
-  padding-bottom: 10px;
-  margin-bottom: 20px;
-}
-
-#resumePreview h2 {
-  font-size: 1.8rem;
-  color: var(--secondary-color);
-  margin-top: 30px;
-  margin-bottom: 15px;
-}
-
-/* Resume sections */
-.resume-section {
-  margin-bottom: 30px;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.resume-section.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Skills */
-.skill-tag {
-  background-color: var(--primary-color);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 15px;
-  font-size: 0.9rem;
-  display: inline-block;
-  margin: 0 5px 5px 0;
-  transition: all 0.3s ease;
-}
-
-.skill-tag:hover {
-  transform: scale(1.05);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.fade-in {
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-@keyframes slideIn {
-  from { transform: translateX(-20px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-.slide-in {
-  animation: slideIn 0.5s ease-in-out;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .container {
-    padding: 1rem;
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --background-color: #1a202c;
+    --text-color: #ffffff;
+    --input-bg: #2d3748;
+    --input-border: #4a5568;
+    --hover-color: #2980b9;
+    --accent-color: #e74c3c;
   }
-
-  #resumePreview {
+  
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, var(--background-color) 0%, #2d3748 100%);
+    color: var(--text-color);
+    line-height: 1.6;
+    transition: background-color 0.5s ease;
+  }
+  
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
     padding: 2rem;
   }
-
+  
+  /* Form elements */
+  input, textarea, select {
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text-color);
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+  
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    outline: none;
+  }
+  
+  /* Buttons */
   .btn {
-    width: 100%;
-    margin-bottom: 10px;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+    letter-spacing: 1px;
   }
-}
-
-/* Print styles */
-@media print {
-  body * {
-    visibility: hidden;
+  
+  .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(50, 50, 93, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
   }
-  #resumePreview, #resumePreview * {
-    visibility: visible;
+  
+  .btn-primary {
+    background-color: var(--primary-color);
+    color: white;
   }
+  
+  .btn-secondary {
+    background-color: var(--secondary-color);
+    color: white;
+  }
+  
+  /* Resume preview */
   #resumePreview {
+    background-color: white;
+    color: #333;
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 3rem;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    transition: all 0.5s ease;
+  }
+  
+  #resumePreview:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  }
+  
+  #resumePreview h1 {
+    font-size: 2.8rem;
+    color: var(--primary-color);
+    border-bottom: 3px solid var(--primary-color);
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  
+  #resumePreview h2 {
+    font-size: 2rem;
+    color: var(--secondary-color);
+    margin-top: 35px;
+    margin-bottom: 20px;
+    position: relative;
+    padding-left: 20px;
+  }
+  
+  #resumePreview h2::before {
+    content: '';
     position: absolute;
     left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    padding: 1in;
-    font-size: 12pt;
-    line-height: 1.5;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    background-color: var(--accent-color);
+    border-radius: 50%;
   }
-}
+  
+  /* Resume sections */
+  .resume-section {
+    margin-bottom: 40px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  
+  .resume-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Skills */
+  .skill-tag {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 1rem;
+    display: inline-block;
+    margin: 0 8px 8px 0;
+    transition: all 0.3s ease;
+  }
+  
+  .skill-tag:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background-color: var(--hover-color);
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.8s ease-in-out;
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateX(-30px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  .slide-in {
+    animation: slideIn 0.8s ease-in-out;
+  }
+  
+  /* Progress bar */
+  .progress-bar {
+    background-color: var(--input-bg);
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  
+  .progress {
+    background-color: var(--primary-color);
+    height: 100%;
+    transition: width 0.5s ease;
+  }
+  
+  /* ATS Score */
+  #atsScore {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 30px;
+  }
+  
+  #atsScore h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: var(--accent-color);
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .container {
+      padding: 1rem;
+    }
+  
+    #resumePreview {
+      padding: 2rem;
+    }
+  
+    .btn {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+  
+    #resumePreview h1 {
+      font-size: 2.2rem;
+    }
+  
+    #resumePreview h2 {
+      font-size: 1.6rem;
+    }
+  }
+  
+  /* Print styles */
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    #resumePreview, #resumePreview * {
+      visibility: visible;
+    }
+    #resumePreview {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      padding: 1in;
+      font-size: 12pt;
+      line-height: 1.5;
+    }
+  }
+  
+/* Subtle background animation */
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  body {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+  }
+  
+  /* Loading spinner */
+  .spinner {
+    display: none;
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Color transitions on hover */
+  .btn, .skill-tag, input, textarea, select {
+    transition: all 0.3s ease;
+  }
+  
+  .btn:hover, .skill-tag:hover {
+    filter: brightness(110%);
+  }
+  
+  /* Theme styles */
+  .modern {
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+  }
+  
+  .creative {
+    font-family: 'Montserrat', sans-serif;
+    color: #2c3e50;
+  }
+  
+  .classic {
+    font-family: 'Merriweather', serif;
+    color: #000;
+  }
+  
+  /* Layout styles */
+  .single-column {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .two-column {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+  }
